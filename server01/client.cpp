@@ -1,76 +1,77 @@
-#include <iostream>
-#include <string>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-
-#pragma comment(lib, "ws2_32.lib")
-
-int main()
-{
-    WSADATA wsData;
-    if (WSAStartup(MAKEWORD(2, 2), &wsData) != 0)
-    {
-        std::cerr << "Failed to initialize Winsock.\n";
-        return 1;
-    }
-
-    SOCKET clientSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (clientSocket == INVALID_SOCKET)
-    {
-        std::cerr << "Failed to create socket.\n";
-        WSACleanup();
-        return 1;
-    }
-
-    sockaddr_in serverAddress;
-    serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(8080);
-    inet_pton(AF_INET, "14.32.200.250", &(serverAddress.sin_addr)); // Replace with your server IP address
-
-    if (connect(clientSocket, (sockaddr*)&serverAddress, sizeof(serverAddress)) == SOCKET_ERROR)
-    {
-        std::cerr << "Failed to connect to the server.\n";
-        closesocket(clientSocket);
-        WSACleanup();
-        return 1;
-    }
-
-    std::cout << "Connected to the server. You can start sending messages.\n";
-
-    char buffer[4096];
-    std::string message;
-
-    while (true)
-    {
-        // Send a message to the server
-        std::cout << "Message: ";
-        std::getline(std::cin, message);
-
-        if (message == "quit")
-        {
-            break;
-        }
-
-        if (send(clientSocket, message.c_str(), message.size() + 1, 0) == SOCKET_ERROR)
-        {
-            std::cerr << "Failed to send message to the server.\n";
-            break;
-        }
-
-        // Receive a message from the server
-        memset(buffer, 0, sizeof(buffer));
-        int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
-        if (bytesReceived <= 0)
-        {
-            std::cerr << "Failed to receive message from the server.\n";
-            break;
-        }
-
-        std::cout << "Server: " << buffer << "\n";
-    }
-
-    closesocket(clientSocket);
-    WSACleanup();
-
-    return 0;
-}
+//#include <iostream>
+//#include <WS2tcpip.h>
+//#include <string>
+//
+//#pragma comment(lib, "ws2_32.lib")
+//
+//int main()
+//{
+//    // Initialize Winsock
+//    WSADATA wsData;
+//    WORD ver = MAKEWORD(2, 2);
+//    int wsResult = WSAStartup(ver, &wsData);
+//    if (wsResult != 0)
+//    {
+//        std::cerr << "Can't initialize Winsock!" << std::endl;
+//        return -1;
+//    }
+//
+//    // Create a socket
+//    SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+//    if (sock == INVALID_SOCKET)
+//    {
+//        std::cerr << "Can't create a socket!" << std::endl;
+//        WSACleanup();
+//        return -1;
+//    }
+//
+//    // Connect to the server
+//    sockaddr_in hint;
+//    hint.sin_family = AF_INET;
+//    hint.sin_port = htons(54000);
+//    inet_pton(AF_INET, "자신의 ip주소", &(hint.sin_addr)); 
+//
+//    int connResult = connect(sock, (sockaddr*)&hint, sizeof(hint));
+//    if (connResult == SOCKET_ERROR)
+//    {
+//        std::cerr << "Can't connect to the server!" << std::endl;
+//        closesocket(sock);
+//        WSACleanup();
+//        return -1;
+//    }
+//
+//    // Do-while loop to send and receive data
+//    char buf[4096];
+//    std::string userInput;
+//
+//    do
+//    {
+//        // Prompt the user for some text
+//        std::cout << "> ";
+//        std::getline(std::cin, userInput);
+//
+//        // Send the text
+//        if (userInput.size() > 0) // Make sure the user has typed something
+//        {
+//            int sendResult = send(sock, userInput.c_str(), userInput.size() + 1, 0);
+//            if (sendResult != SOCKET_ERROR)
+//            {
+//                // Wait for response
+//                ZeroMemory(buf, 4096);
+//                int bytesReceived = recv(sock, buf, 4096, 0);
+//                if (bytesReceived > 0)
+//                {
+//                    // Echo response to console
+//                    std::cout << "SERVER> " << std::string(buf, 0, bytesReceived) << std::endl;
+//                }
+//            }
+//        }
+//    } while (userInput.size() > 0);
+//
+//    // Gracefully close down everythsddsing
+//    closesocket(sock);
+//    WSACleanup();
+//
+//    return 0;
+//}
+//
